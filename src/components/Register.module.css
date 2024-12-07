@@ -1,4 +1,4 @@
-.container {
+/* .container {
   padding: 20px;
   max-width: 400px;
   margin: 50px auto;
@@ -40,4 +40,77 @@
 
 .button:hover {
   background-color: #218838;
+} */
+
+
+/* Geral */
+.container {
+  padding: 20px;
+  max-width: 400px;
+  margin: 50px auto;
+  background: #f7f8fa; /* Fundo claro */
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: "Arial", sans-serif;
+  color: #333333;
+}
+
+/* Labels */
+.label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: block;
+  color: #008080; /* Azul-petróleo para destaques */
+}
+
+/* Campos de entrada */
+.input,
+.select {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #d1d5db;
+  border-radius: 5px;
+  background-color: #ffffff;
+  color: #333333;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+.input:focus,
+.select:focus {
+  border-color: #008080;
+  outline: none;
+}
+
+/* Botão */
+.button {
+  background-color: #008080;
+  color: #ffffff;
+  border: none;
+  padding: 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  width: 100%;
+}
+
+.button:hover {
+  background-color: #006666;
+  transform: translateY(-2px);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .container {
+    padding: 15px;
+  }
+
+  .button {
+    font-size: 14px;
+    padding: 10px;
+  }
 }

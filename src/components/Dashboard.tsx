@@ -10,7 +10,6 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Dashboard</h1>
       <h1 className={styles.title}>Bem-vindo de volta, {user!.username}</h1>
 
       {user!.role === "admin" && (

@@ -21,40 +21,55 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className={styles.container}>
-      <form className={styles.form} onSubmit={handleSubmit}>
-        <h1>Login</h1>
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <div>
-          <label className={styles.label}>Usuário</label>
-          <input
-            className={styles.input}
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="Digite seu usuário"
-          />
-        </div>
-        <div>
-          <label className={styles.label}>Senha</label>
-          <input
-            className={styles.input}
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Digite sua senha"
-          />
-        </div>
-        <div className={styles.containerButtons}>
-          <button className={styles.button} type="submit">
-            Entrar
-          </button>
-          <a className={styles.register} href="/register">
-            Criar conta
-          </a>
-        </div>
-      </form>
-    </div>
+  <div className={styles.container}>
+ <div className={styles.form_container}>
+ <p className={styles.title}>Login</p>
+ {error && <p style={{ color: "red" }}>{error}</p>}
+ <form className={styles.Form} onSubmit={handleSubmit}>
+   <input type="text" className={styles.input} value={username} placeholder="Usuário" onChange={(e) => setUsername(e.target.value)} /> 
+   <input type="password" className={styles.input} value={password} placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
+   <button type="submit" className={styles.form_btn}>Entrar</button>
+ </form>
+ <p className={styles.sign_up_label}>
+   Não tem uma conta? <a className={styles.sing_up_link} href="/register">Criar Conta</a>
+ </p>
+ </div>
+</div>
+
+    // <div className={styles.container}>
+    //   <form className={styles.form} onSubmit={handleSubmit}>
+    //     <h1>Login</h1>
+    //     {error && <p style={{ color: "red" }}>{error}</p>}
+    //     <div>
+    //       <label className={styles.label}>Usuário</label>
+    //       <input
+    //         className={styles.input}
+    //         type="text"
+    //         value={username}
+    //         onChange={(e) => setUsername(e.target.value)}
+    //         placeholder="Digite seu usuário"
+    //       />
+    //     </div>
+    //     <div>
+    //       <label className={styles.label}>Senha</label>
+    //       <input
+    //         className={styles.input}
+    //         type="password"
+    //         value={password}
+    //         onChange={(e) => setPassword(e.target.value)}
+    //         placeholder="Digite sua senha"
+    //       />
+    //     </div>
+    //     <div className={styles.containerButtons}>
+    //       <button className={styles.button} type="submit">
+    //         Entrar
+    //       </button>
+    //       <a className={styles.register} href="/register">
+    //         Criar conta
+    //       </a>
+    //     </div>
+    //   </form>
+    // </div>
   );
 };
 

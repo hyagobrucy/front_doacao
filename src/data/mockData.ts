@@ -7,8 +7,8 @@ export const mockUsers: User[] = [
 ];
 
 export const mockOrgans: Organ[] = [
-  { id: 1, name: "Heart", status: "available" },
-  { id: 2, name: "Liver", status: "waiting" },
+  { id: 1, name: "Coração", status: "available" },
+  { id: 2, name: "Fígado", status: "waiting" },
 ];
 
 export const mockHospitals: Hospital[] = [

@@ -1,7 +1,6 @@
 export interface User {
   id: number;
   username: string;
-  password: string;
   role: "admin" | "receptor" | "doador";
 }
 
@@ -14,4 +13,5 @@ export interface Organ {
 export interface Hospital {
   id: number;
   name: string;
+  location?: string; 
 }

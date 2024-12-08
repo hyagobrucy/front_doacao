@@ -1,77 +1,90 @@
 import React, { useState } from "react";
+import "./Register.module.css"
+import { api } from "../api/api";
 import { useNavigate } from "react-router-dom";
-import { mockUsers } from "../data/mockData";
-import { User } from "../types";
-import styles from "./Register.module.css";
 
 const Register: React.FC = () => {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<"admin" | "receptor" | "doador">("receptor");
-  const [message, setMessage] = useState("");
+  const [name, setName] = useState("");
+  const [role, setRole] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const navigate = useNavigate();
 
-  const handleRegister = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleRegister = async () => {
+    setLoading(true); // Inicia o carregamento
+    setErrorMessage(null); // Limpa mensagens de erro anteriores
 
-    if (mockUsers.find((user) => user.username === username)) {
-      setMessage("Usuário já existe. Escolha outro nome.");
-      return;
+    try {
+      await api.post("/auth/register", { email, password, name, role });
+      alert("Registro concluído com sucesso!");
+      navigate("/auth/login");
+    } catch (error: any) {
+      console.error("Erro no registro:", error);
+      setErrorMessage(
+        error.response?.data?.message || "Erro ao tentar se registrar. Tente novamente."
+      );
+    } finally {
+      setLoading(false);
     }
+  };
 
-    const newUser: User = {
-      id: mockUsers.length + 1,
-      username,
-      password,
-      role,
-    };
-
-    mockUsers.push(newUser);
-    setMessage("Registro realizado com sucesso!");
-    setTimeout(() => navigate("/"), 2000);
+  // Validação: O botão só deve estar habilitado se todos os campos estiverem preenchidos
+  const isFormValid = () => {
+    return name.trim() !== "" && email.trim() !== "" && password.trim() !== "" && role.trim() !== "";
   };
 
   return (
-    <form className={styles.container} onSubmit={handleRegister}>
-      <h1>Cadastro</h1>
-      {message && <p style={{ color: "green" }}>{message}</p>}
-      <div>
-        <label className={styles.label}>Usuário</label>
-        <input
-          className={styles.input}
-          type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          placeholder="Digite seu usuário"
-        />
-      </div>
-      <div>
-        <label className={styles.label}>Senha</label>
-        <input
-          className={styles.input}
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Digite sua senha"
-        />
-      </div>
-      <div>
-        <label className={styles.label}>Tipo de Conta</label>
-        <select
-          className={styles.select}
-          value={role}
-          onChange={(e) =>
-            setRole(e.target.value as "admin" | "receptor" | "doador")
-          }
-        >
-          <option value="receptor">Receptor</option>
-          <option value="doador">Doador</option>
-        </select>
-      </div>
-      <button className={styles.button} type="submit">
-        Registrar
+    <div>
+      <h2>Cadastro</h2>
+
+      {/* Campo Nome */}
+      <input
+        type="text"
+        placeholder="Digite seu nome"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
+
+      {/* Campo Role */}
+      <select
+        value={role}
+        onChange={(e) => setRole(e.target.value)}
+      >
+        <option value="">Selecione sua role</option>
+        <option value="receptor">Receptor</option>
+        <option value="doador">Doador</option>
+      </select>
+
+      {/* Campo Email */}
+      <input
+        type="email"
+        placeholder="Digite seu email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+
+      {/* Campo Senha */}
+      <input
+        type="password"
+        placeholder="Digite sua senha"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
+
+      {/* Mensagem de erro */}
+      {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+
+      {/* Botão de registro com carregamento */}
+      <button
+        onClick={handleRegister}
+        disabled={!isFormValid() || loading}
+      >
+        {loading ? "Carregando..." : "Registrar"}
       </button>
-    </form>
+    </div>
   );
 };
 

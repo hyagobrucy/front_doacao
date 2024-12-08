@@ -1,96 +1,113 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { mockHospitals, mockOrgans, mockUsers } from "../data/mockData";
+import axios from "axios";
 import styles from "./Dashboard.module.css";
+import { Hospital, Organ } from "../types";
+
+// Configuração do Axios
+const api = axios.create({
+  baseURL: "http://localhost:8000/api", // Atualize conforme seu ambiente
+  headers: { "Content-Type": "application/json" },
+});
+
+// Componente para renderizar uma lista genérica
+const ListSection: React.FC<{ title: string; items: string[] }> = ({ title, items }) => (
+  <div className={styles.section}>
+    <h3 className={styles.subtitle}>{title}</h3>
+    {items.length > 0 ? (
+      <ul className={styles.list}>
+        {items.map((item, index) => (
+          <li key={index} className={styles.item}>
+            {item}
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p>Nenhum dado disponível.</p>
+    )}
+  </div>
+);
 
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
-  const doadores = mockUsers.filter((user) => user.role === "doador");
-  const receptores = mockUsers.filter((user) => user.role === "receptor");
+  const [hospitals, setHospitals] = useState<Hospital[]>([]);
+  const [organs, setOrgans] = useState<Organ[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Função para buscar dados da API
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const [hospitalResponse, organResponse] = await Promise.all([
+          api.get<Hospital[]>("/hospitals"),
+          api.get<Organ[]>("/organs"),
+        ]);
+
+        setHospitals(hospitalResponse.data || []);
+        setOrgans(organResponse.data || []);
+      } catch (err) {
+        console.error("Erro ao buscar dados:", err);
+        setError("Não foi possível carregar os dados. Tente novamente mais tarde.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Separar órgãos por status
+  const availableOrgans = organs.filter((organ) => organ.status === "available");
+  const waitingOrgans = organs.filter((organ) => organ.status === "waiting");
+
+  if (!user) {
+    return <p>Carregando...</p>;
+  }
 
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>Dashboard</h1>
-      <h1 className={styles.title}>Bem-vindo de volta, {user!.username}</h1>
+      <h2 className={styles.subtitle}>Bem-vindo de volta, {user.username}!</h2>
 
-      {user!.role === "admin" && (
+      {loading ? (
+        <p>Carregando dados...</p>
+      ) : error ? (
+        <p className={styles.error}>{error}</p>
+      ) : (
         <>
-          <div className={styles.section}>
-            <h2 className={styles.subtitle}>Usuários Cadastrados</h2>
-            <h3>Doadores:</h3>
-            <ul className={styles.list}>
-              {doadores.map((user) => (
-                <li key={user.id} className={styles.item}>
-                  {user.username}
-                </li>
-              ))}
-            </ul>
-            <h3>Receptores:</h3>
-            <ul className={styles.list}>
-              {receptores.map((user) => (
-                <li key={user.id} className={styles.item}>
-                  {user.username}
-                </li>
-              ))}
-            </ul>
-          </div>
+          {user.role === "admin" && (
+            <>
+              <ListSection
+                title="Hospitais Cadastrados"
+                items={hospitals.map((hospital) => hospital.name)}
+              />
+              <ListSection
+                title="Órgãos Cadastrados"
+                items={organs.map(
+                  (organ) => `${organ.name} - ${organ.status === "available" ? "Disponível" : "Aguardando"}`
+                )}
+              />
+            </>
+          )}
 
-          <div className={styles.section}>
-            <h2 className={styles.subtitle}>Hospitais Cadastrados</h2>
-            <ul className={styles.list}>
-              {mockHospitals.map((hospital) => (
-                <li key={hospital.id} className={styles.item}>
-                  {hospital.name}
-                </li>
-              ))}
-            </ul>
-            <button className={styles.button}>Cadastrar Hospital</button>
-          </div>
+          {user.role === "receptor" && (
+            <ListSection
+              title="Órgãos Aguardando"
+              items={waitingOrgans.map((organ) => organ.name)}
+            />
+          )}
 
-          <div className={styles.section}>
-            <h2 className={styles.subtitle}>Órgãos Cadastrados</h2>
-            <ul className={styles.list}>
-              {mockOrgans.map((organ) => (
-                <li key={organ.id} className={styles.item}>
-                  {organ.name} -{" "}
-                  {organ.status === "available" ? "Disponível" : "Aguardando"}
-                </li>
-              ))}
-            </ul>
-            <button className={styles.button}>Cadastrar Órgão</button>
-          </div>
+          {user.role === "doador" && (
+            <ListSection
+              title="Painel do Doador"
+              items={availableOrgans.map((organ) => organ.name)}
+            />
+          )}
         </>
-      )}
-
-      {user!.role === "receptor" && (
-        <div className={styles.section}>
-          <h2 className={styles.subtitle}>Órgãos Aguardando</h2>
-          <ul className={styles.list}>
-            {mockOrgans
-              .filter((organ) => organ.status === "waiting")
-              .map((organ) => (
-                <li key={organ.id} className={styles.item}>
-                  {organ.name} - Aguardando
-                </li>
-              ))}
-          </ul>
-        </div>
-      )}
-
-      {user!.role === "doador" && (
-        <div className={styles.section}>
-          <h2 className={styles.subtitle}>Painel do Doador</h2>
-          <p>Obrigado por ser um doador!</p>
-          <ul className={styles.list}>
-            {mockOrgans
-              .filter((organ) => organ.status === "available")
-              .map((organ) => (
-                <li key={organ.id} className={styles.item}>
-                  {organ.name} - Disponível
-                </li>
-              ))}
-          </ul>
-        </div>
       )}
     </div>
   );
